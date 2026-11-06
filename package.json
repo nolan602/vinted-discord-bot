@@ -1,9 +1,5 @@
-
 {
   "name": "vinted-discord-bot-host",
   "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "prepare": "npm --prefix app install --no-audit --no-fund && npm --prefix app run build"
-  }
+  "private": true
 }
