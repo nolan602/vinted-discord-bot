@@ -1,16 +1,29 @@
+const { spawnSync } = require("child_process");
+const path = require("path");
 
-const { execFileSync } = require("node:child_process");
-const path = require("node:path");
+const app = path.join(__dirname, "app");
 
-const appDir = path.join(__dirname, "app");
+function run(command, args, cwd) {
+    const result = spawnSync(command, args, {
+        cwd,
+        stdio: "inherit"
+    });
 
-console.log("Installation terminée, démarrage des commandes Discord...");
+    if (result.error) throw result.error;
 
-execFileSync(process.execPath, ["create-cmds.js"], {
-    cwd: appDir,
-    stdio: "inherit"
-});
+    if (result.status !== 0) {
+        process.exit(result.status || 1);
+    }
+}
 
-console.log("Démarrage du bot Vinted...");
+console.log("Installation des dépendances...");
+run("npm", ["install", "--prefix", "app", "--ignore-scripts", "--no-audit", "--no-fund"], __dirname);
 
-require(path.join(appDir, "dist", "index.js"));
+console.log("Compilation du bot...");
+run("npm", ["run", "build", "--prefix", "app"], __dirname);
+
+console.log("Enregistrement des commandes Discord...");
+run(process.execPath, ["create-cmds.js"], app);
+
+console.log("Démarrage du bot...");
+require(path.join(app, "dist", "index.js"));
